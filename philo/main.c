@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 01:51:22 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/04 03:36:47 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/04 15:32:39 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,7 @@ int	main(int argc, char **argv)
 	dyn = NULL;
 	if (!init_philos(&dyn, &p, argc, argv))
 		return (gc_free_all(dyn), printf("failed to parse arguments\n"), 1);
-	return (0);
+	if (!start_philos(&p))
+		return (gc_free_all(dyn), printf("failed to start philo\n"), 1);
+	return (!watch_philos(&dyn, &p));
 }

@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 20:16:40 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/04 01:50:29 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/04 18:18:58 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,4 +96,11 @@ size_t	*uparse(t_list **dyn, const char *str)
 		return (NULL);
 	*res = (size_t)temp;
 	return (res);
+}
+
+size_t	umin(size_t a, size_t b)
+{
+	if (a > b)
+		return (b);
+	return (a);
 }

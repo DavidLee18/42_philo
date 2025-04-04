@@ -1,0 +1,130 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lifecycle.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/04 14:37:30 by jaehylee          #+#    #+#             */
+/*   Updated: 2025/04/05 04:59:49 by jaehylee         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "philo.h"
+
+_Bool	start_philos(t_philosopher *p)
+{
+	size_t	i;
+	t_list	*node;
+
+	i = 0;
+	node = &p->forks;
+	while (i < p->num)
+	{
+		p->philos[i].n = i + 1;
+		p->philos[i].time = &p->time;
+		p->philos[i].display = &p->display;
+		p->philos[i].fork = node;
+		if (pthread_mutex_init(&p->philos[i].guard, NULL)
+			|| pthread_create(&p->philos[i].id, NULL, _do, p->philos + i))
+			return (0);
+		node = node->next;
+		i++;
+	}
+	return (1);
+}
+
+_Bool	watch_philos(t_list **dyn, t_philosopher *p)
+{
+	size_t	i;
+	size_t	min_eaten;
+
+	i = 0;
+	min_eaten = 0;
+	while ((p->time.enough && min_eaten < *p->time.enough) || !p->time.enough)
+	{
+		if (pthread_mutex_lock(&p->philos[i].guard))
+			return (0);
+		if (p->philos[i].dead)
+			return (!pthread_mutex_unlock(&p->philos[i].guard)
+				&& philocide(dyn, p));
+		if (pthread_mutex_unlock(&p->philos[i].guard))
+			return (0);
+		usleep(100);
+		if (pthread_mutex_lock(&p->philos[i].guard))
+			return (0);
+		min_eaten = umin(min_eaten, p->philos[i].meals);
+		if (pthread_mutex_unlock(&p->philos[i].guard))
+			return (0);
+		usleep(100);
+		i = (i + 1) % p->num;
+	}
+	return (philocide(dyn, p));
+}
+
+_Bool	philocide(t_list **dyn, t_philosopher *p)
+{
+	size_t	i;
+
+	if (pthread_mutex_lock(&p->guard))
+		return (0);
+	p->finished = 1;
+	if (pthread_mutex_unlock(&p->guard))
+		return (0);
+	i = 0;
+	while (i < p->num)
+	{
+		if (pthread_join(p->philos[i].id, NULL)
+			|| pthread_mutex_destroy(&p->philos[i].guard))
+			return (0);
+		i++;
+	}
+	if (pthread_mutex_destroy(&p->display) || pthread_mutex_destroy(&p->guard)
+		|| !drop_forks(p))
+		return (0);
+	gc_free_all(*dyn);
+	return (1);
+}
+
+_Bool	drop_forks(t_philosopher *p)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < p->num)
+	{
+		if (pthread_mutex_destroy(p->philos[i].fork->content))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void	eat(t_philo *p)
+{
+	if (atm_dead(p))
+		return ;
+	if (p->last_eaten == 0)
+		p->last_eaten = now();
+	pthread_mutex_lock(p->fork->content);
+	atm_print(p, "has taken a fork");
+	if (p->fork->next != NULL)
+		(pthread_mutex_lock(p->fork->next->content),
+			atm_print(p, "has taken a fork"));
+	else
+		usleep(p->time->die);
+	if (now() - p->last_eaten >= p->time->die)
+	{
+		if (p->fork->next != NULL)
+			pthread_mutex_unlock(p->fork->next->content);
+		pthread_mutex_unlock(p->fork->content);
+		atm_die(p);
+		return ;
+	}
+	atm_print(p, "is eating");
+	atm_eat(p);
+	usleep(p->time->eat);
+	if (p->fork->next != NULL)
+		pthread_mutex_unlock(p->fork->next->content);
+	pthread_mutex_unlock(p->fork->content);
+}
