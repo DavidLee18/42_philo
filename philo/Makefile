@@ -1,5 +1,5 @@
 CC := cc
-CFLAGS := -Wall -Werror -Wextra -g
+CFLAGS := -Wall -Werror -Wextra -O2 -foptimize-sibling-calls
 NAME := philo
 
 SRCS := atomic.c etc.c gc.c init.c lifecycle.c lifecycle2.c \

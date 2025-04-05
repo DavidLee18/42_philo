@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 02:53:08 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 22:35:03 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 01:27:12 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 _Bool	init_philos(t_list **dyn, t_philosopher *p, int argc, char **argv)
 {
-	size_t	*n;
+	ssize_t	*n;
 
-	n = uparse(dyn, argv[1]);
-	if (n == NULL || *n == 0)
+	n = lparse(dyn, argv[1]);
+	if (n == NULL || *n <= 0)
 		return (0);
 	p->num = *n;
 	p->philos = (t_philo *)gc_calloc(dyn, *n, sizeof(t_philo));
@@ -30,24 +30,30 @@ _Bool	init_philos(t_list **dyn, t_philosopher *p, int argc, char **argv)
 
 _Bool	set_time(t_list **dyn, t_philosopher *p, size_t argc, char **argv)
 {
-	size_t	*i;
+	ssize_t	*i;
 
-	i = uparse(dyn, argv[0]);
-	if (i == NULL || *i == 0)
+	i = lparse(dyn, argv[0]);
+	if (i == NULL || *i <= 0)
 		return (0);
 	p->time.die = *i;
-	i = uparse(dyn, argv[1]);
-	if (i == NULL || *i == 0)
+	i = lparse(dyn, argv[1]);
+	if (i == NULL || *i <= 0)
 		return (0);
 	p->time.eat = *i;
-	i = uparse(dyn, argv[2]);
-	if (i == NULL || *i == 0)
+	i = lparse(dyn, argv[2]);
+	if (i == NULL || *i <= 0)
 		return (0);
 	p->time.sleep = *i;
 	if (argc == 3)
 		p->time.enough = NULL;
 	else
-		p->time.enough = uparse(dyn, argv[3]);
+	{
+		i = lparse(dyn, argv[3]);
+		if (i == NULL || *i <= 0)
+			return (0);
+		*i = (size_t)(*i);
+		p->time.enough = (size_t *)i;
+	}
 	return (1);
 }
 

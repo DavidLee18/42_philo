@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:37:30 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 22:36:02 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 00:39:13 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@ _Bool	start_philos(t_philosopher *p)
 		p->philos[i].time = &p->time;
 		p->philos[i].display = &p->display;
 		p->philos[i].fork = node;
+		p->philos[i].genesis = &p->genesis;
+		p->philos[i].dead = 0;
 		if (pthread_mutex_init(&p->philos[i].guard, NULL)
 			|| pthread_create(&p->philos[i].id, NULL, _do, p->philos + i))
 			return (0);
-		p->philos[i].genesis = &p->genesis;
 		node = node->next;
 		i++;
 	}
@@ -38,20 +39,12 @@ _Bool	start_philos(t_philosopher *p)
 _Bool	watch_philos(t_list **dyn, t_philosopher *p)
 {
 	size_t	i;
-	size_t	min_eaten;
 
 	i = 0;
-	min_eaten = 0;
-	while ((p->time.enough && min_eaten < *p->time.enough) || !p->time.enough)
+	while (!all_enough(p))
 	{
 		if (atm_dead(&p->philos[i]))
 			break ;
-		usleep(PLANCK_TIME);
-		if (pthread_mutex_lock(&p->philos[i].guard))
-			return (0);
-		min_eaten = umin(min_eaten, p->philos[i].meals);
-		if (pthread_mutex_unlock(&p->philos[i].guard))
-			return (0);
 		usleep(PLANCK_TIME);
 		i = (i + 1) % p->num;
 	}
@@ -119,7 +112,6 @@ void	eat(t_philo *p)
 		return ;
 	}
 	atm_eat(p);
-	usleep(p->time->eat * MS);
 	if (p->fork->next != NULL)
 		pthread_mutex_unlock(p->fork->next->content);
 	pthread_mutex_unlock(p->fork->content);

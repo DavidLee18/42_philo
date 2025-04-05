@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 20:16:40 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/04 18:18:58 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 01:23:40 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,27 +74,29 @@ void
 	return (dst);
 }
 
-size_t	*uparse(t_list **dyn, const char *str)
+ssize_t	*lparse(t_list **dyn, const char *str)
 {
-	unsigned long long	temp;
-	size_t				*res;
-	size_t				i;
+	ssize_t		*res;
+	size_t		i;
+	int			sign;
 
-	i = 0;
-	res = (size_t *)gc_calloc(dyn, 1, sizeof(size_t));
+	res = (ssize_t *)gc_calloc(dyn, 1, sizeof(ssize_t));
 	if (res == NULL)
 		return (NULL);
-	temp = 0;
+	*res = 0;
+	if ((*str < '0' || *str > '9') && *str != '-' && *str != '+')
+		return (NULL);
+	if ((*str == '-' || *str == '+') && str[1] == '\0')
+		return (NULL);
+	sign = (*str != '-') * 2 - 1;
+	i = (*str == '-' || *str == '+');
 	while (str[i])
 	{
 		if (str[i] < '0' || str[i] > '9')
 			return (NULL);
-		temp = temp * 10 + str[i] - '0';
+		*res = *res * 10 + sign * (str[i] - '0');
 		i++;
 	}
-	if (temp > 4294967295)
-		return (NULL);
-	*res = (size_t)temp;
 	return (res);
 }
 

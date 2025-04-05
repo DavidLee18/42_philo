@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 17:48:42 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 22:34:14 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 01:07:52 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <sys/time.h>
 # define PLANCK_TIME 100
 # define MS 1000
+# define USIZE_MAX 4294967295
 
 typedef struct s_list
 {
@@ -66,7 +67,7 @@ void			*gc_calloc(t_list **head, const size_t count,
 					const size_t size);
 _Bool			gc_add_to_list(t_list **head, void *new);
 void			gc_free_all(t_list *head);
-size_t			*uparse(t_list **dyn, const char *str);
+ssize_t			*lparse(t_list **dyn, const char *str);
 size_t			umin(size_t a, size_t b);
 
 _Bool			init_philos(t_list **dyn, t_philosopher *p, int argc,
@@ -83,11 +84,13 @@ size_t			now(void);
 void			eat(t_philo *p);
 void			_sleep(t_philo *p);
 size_t			rel_now(t_philo *p);
+_Bool			all_enough(t_philosopher *p);
 
 void			atm_print(t_philo *p, char *str);
 void			atm_die(t_philo *p);
 _Bool			atm_dead(t_philo *p);
 void			atm_eat(t_philo *p);
 size_t			atm_last_eaten(t_philo *p);
+size_t			atm_meal(t_philo *p);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 01:27:11 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 22:36:02 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 00:18:50 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	atm_eat(t_philo *p)
 {
 	pthread_mutex_lock(&p->guard);
 	atm_print(p, "is eating");
+	usleep(p->time->eat * MS);
 	p->last_eaten = rel_now(p);
 	p->meals++;
 	pthread_mutex_unlock(&p->guard);

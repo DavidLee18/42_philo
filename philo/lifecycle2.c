@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 01:27:20 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 22:36:02 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 00:13:48 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ void	*_do(void *philo)
 	t_philo	*p;
 
 	p = (t_philo *)philo;
+	if (p->n % 2 == 0)
+		usleep(2 * PLANCK_TIME);
 	while (1)
 	{
 		usleep(PLANCK_TIME);
