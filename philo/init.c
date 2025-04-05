@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 02:53:08 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 04:38:45 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/05 22:35:03 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ _Bool	init_philos(t_list **dyn, t_philosopher *p, int argc, char **argv)
 	if (p->philos == NULL || !place_forks(dyn, p) || !set_time(dyn, p, argc - 2,
 			argv + 2) || pthread_mutex_init(&p->display, NULL))
 		return (0);
-	p->finished = 0;
+	p->genesis = now();
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 17:48:42 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 05:02:11 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/05 22:34:14 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include <pthread.h>
 # include <unistd.h>
 # include <sys/time.h>
+# define PLANCK_TIME 100
+# define MS 1000
 
 typedef struct s_list
 {
@@ -43,17 +45,18 @@ typedef struct s_philo
 	size_t			meals;
 	size_t			last_eaten;
 	t_time			*time;
+	size_t			*genesis;
 }	t_philo;
 
 typedef struct s_philosopher
 {
+	size_t			genesis;
 	size_t			num;
 	t_philo			*philos;
 	t_list			forks;
 	t_time			time;
 	pthread_mutex_t	display;
 	pthread_mutex_t	guard;
-	_Bool			finished;
 }	t_philosopher;
 
 void			ft_bzero(void *s, size_t n);
@@ -79,11 +82,12 @@ _Bool			drop_forks(t_philosopher *p);
 size_t			now(void);
 void			eat(t_philo *p);
 void			_sleep(t_philo *p);
-void			think(t_philo *p);
+size_t			rel_now(t_philo *p);
 
 void			atm_print(t_philo *p, char *str);
 void			atm_die(t_philo *p);
 _Bool			atm_dead(t_philo *p);
 void			atm_eat(t_philo *p);
+size_t			atm_last_eaten(t_philo *p);
 
 #endif

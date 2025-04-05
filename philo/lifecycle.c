@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:37:30 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/05 04:59:49 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/05 22:36:02 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ _Bool	start_philos(t_philosopher *p)
 		if (pthread_mutex_init(&p->philos[i].guard, NULL)
 			|| pthread_create(&p->philos[i].id, NULL, _do, p->philos + i))
 			return (0);
+		p->philos[i].genesis = &p->genesis;
 		node = node->next;
 		i++;
 	}
@@ -43,20 +44,15 @@ _Bool	watch_philos(t_list **dyn, t_philosopher *p)
 	min_eaten = 0;
 	while ((p->time.enough && min_eaten < *p->time.enough) || !p->time.enough)
 	{
-		if (pthread_mutex_lock(&p->philos[i].guard))
-			return (0);
-		if (p->philos[i].dead)
-			return (!pthread_mutex_unlock(&p->philos[i].guard)
-				&& philocide(dyn, p));
-		if (pthread_mutex_unlock(&p->philos[i].guard))
-			return (0);
-		usleep(100);
+		if (atm_dead(&p->philos[i]))
+			break ;
+		usleep(PLANCK_TIME);
 		if (pthread_mutex_lock(&p->philos[i].guard))
 			return (0);
 		min_eaten = umin(min_eaten, p->philos[i].meals);
 		if (pthread_mutex_unlock(&p->philos[i].guard))
 			return (0);
-		usleep(100);
+		usleep(PLANCK_TIME);
 		i = (i + 1) % p->num;
 	}
 	return (philocide(dyn, p));
@@ -66,11 +62,12 @@ _Bool	philocide(t_list **dyn, t_philosopher *p)
 {
 	size_t	i;
 
-	if (pthread_mutex_lock(&p->guard))
-		return (0);
-	p->finished = 1;
-	if (pthread_mutex_unlock(&p->guard))
-		return (0);
+	i = 0;
+	while (i < p->num)
+	{
+		atm_die(p->philos + i);
+		i++;
+	}
 	i = 0;
 	while (i < p->num)
 	{
@@ -105,15 +102,15 @@ void	eat(t_philo *p)
 	if (atm_dead(p))
 		return ;
 	if (p->last_eaten == 0)
-		p->last_eaten = now();
+		p->last_eaten = rel_now(p);
 	pthread_mutex_lock(p->fork->content);
 	atm_print(p, "has taken a fork");
 	if (p->fork->next != NULL)
 		(pthread_mutex_lock(p->fork->next->content),
 			atm_print(p, "has taken a fork"));
 	else
-		usleep(p->time->die);
-	if (now() - p->last_eaten >= p->time->die)
+		usleep(p->time->die * MS);
+	if (rel_now(p) - p->last_eaten >= p->time->die)
 	{
 		if (p->fork->next != NULL)
 			pthread_mutex_unlock(p->fork->next->content);
@@ -121,9 +118,8 @@ void	eat(t_philo *p)
 		atm_die(p);
 		return ;
 	}
-	atm_print(p, "is eating");
 	atm_eat(p);
-	usleep(p->time->eat);
+	usleep(p->time->eat * MS);
 	if (p->fork->next != NULL)
 		pthread_mutex_unlock(p->fork->next->content);
 	pthread_mutex_unlock(p->fork->content);
