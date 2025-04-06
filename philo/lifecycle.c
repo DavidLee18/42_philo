@@ -6,7 +6,7 @@
 /*   By: jaehylee <jaehylee@student.42gyeongsan.kr> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/04 14:37:30 by jaehylee          #+#    #+#             */
-/*   Updated: 2025/04/06 00:39:13 by jaehylee         ###   ########.fr       */
+/*   Updated: 2025/04/06 15:19:13 by jaehylee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	eat(t_philo *p)
 			atm_print(p, "has taken a fork"));
 	else
 		usleep(p->time->die * MS);
-	if (rel_now(p) - p->last_eaten >= p->time->die)
+	if (rel_now(p) - p->last_eaten >= p->time->die || atm_dead(p))
 	{
 		if (p->fork->next != NULL)
 			pthread_mutex_unlock(p->fork->next->content);
